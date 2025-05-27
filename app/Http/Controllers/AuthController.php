@@ -36,7 +36,6 @@ class AuthController extends Controller
                 'message' => 'User registered successfully. Please log in.',
                 'user' => $user->only(['id', 'username', 'email']),
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -62,16 +61,35 @@ class AuthController extends Controller
         $credentials = $request->only(['email', 'password']);
 
         try {
+
+            $user = User::where('email', $credentials['email'])->first();
+
+            if (!$user) {
+
+                return response()->json(['status' => 'error', 'message' => 'Email tidak terdaftar.'], 401);
+            }
+
+
+            if (!Hash::check($credentials['password'], $user->password)) {
+
+                return response()->json(['status' => 'error', 'message' => 'Password salah.'], 401);
+            }
+
+
             if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['status' => 'error', 'message' => 'Invalid credentials'], 401);
+
+
+                return response()->json(['status' => 'error', 'message' => 'Gagal membuat token autentikasi.'], 401);
             }
         } catch (JWTException $e) {
-            return response()->json(['status' => 'error', 'message' => 'Could not create token'], 500);
+
+            return response()->json(['status' => 'error', 'message' => 'Terjadi kesalahan server saat login, tidak dapat membuat token.'], 500);
         }
+
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Login successful',
+            'message' => 'Login berhasil',
             'user' => auth()->user()->only(['id', 'username', 'email']),
             'token' => $token,
             'token_type' => 'bearer',
@@ -120,7 +138,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        // Token baru sudah ditambahkan ke header oleh RefreshTokenMiddleware
+
         return response()->json([
             'status' => 'success',
             'message' => 'Token refreshed successfully. Check Authorization header for new token.'

@@ -12,11 +12,11 @@ return [
      | to accept any value.
      |
      */
-    'paths' => ['api/*', 'register', 'login', 'logout', 'me', 'moods/*', '*'], // Sesuaikan path API Anda
-    'allowed_methods' => ['*'], // Izinkan semua metode (GET, POST, PUT, DELETE, OPTIONS)
-    'allowed_origins' => ['http://127.0.0.1:5501', 'http://localhost:5501'], // URL frontend Anda
+    'paths' => ['api/*', 'register', 'login', 'logout', 'me', 'moods/*', '*'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => ['http://127.0.0.1:5501', 'http://localhost:5501'],
     'allowed_origins_patterns' => [],
-    'allowed_headers' => ['*'], // Izinkan semua header, termasuk Authorization
+    'allowed_headers' => ['*'], 
     'exposed_headers' => [],
     'max_age' => 0,
     'supports_credentials' => false,

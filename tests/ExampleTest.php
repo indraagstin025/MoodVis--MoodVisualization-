@@ -7,6 +7,8 @@ use Laravel\Lumen\Testing\DatabaseTransactions;
 
 class ExampleTest extends TestCase
 {
+    // ... (gunakan DatabaseMigrations dan DatabaseTransactions jika perlu)
+
     /**
      * A basic test example.
      *
@@ -16,8 +18,16 @@ class ExampleTest extends TestCase
     {
         $this->get('/');
 
-        $this->assertEquals(
-            $this->app->version(), $this->response->getContent()
-        );
+        // Ubah assertion ini
+        $this->assertResponseOk(); // Memastikan status 200
+        $this->seeJsonStructure([ // Memastikan struktur JSON
+            'status',
+            'message',
+            'version'
+        ]);
+        $this->seeJson([ // Atau memastikan konten JSON spesifik
+            'status' => 'success',
+            'message' => 'Welcome to your Lumen API!'
+        ]);
     }
 }
