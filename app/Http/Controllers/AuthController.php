@@ -24,6 +24,8 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
+        /** @var \App\Models\User $user  */
+
         try {
             $user = User::create([
                 'username' => $request->input('username'),
@@ -50,6 +52,7 @@ class AuthController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      */
     public function login(Request $request)
     {
@@ -90,6 +93,9 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Login berhasil',
+
+            /** @var \App\Models\User $user */
+
             'user' => auth()->user()->only(['id', 'username', 'email']),
             'token' => $token,
             'token_type' => 'bearer',
@@ -107,6 +113,9 @@ class AuthController extends Controller
     {
         return response()->json([
             'status' => 'success',
+
+        /** @var \App\Models\User $user */
+
             'user' => auth()->user()->only(['id', 'username', 'email'])
         ]);
     }
