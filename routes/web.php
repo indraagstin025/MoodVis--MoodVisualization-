@@ -38,10 +38,7 @@ $router->group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function () use 
     $router->post('emotion-records', 'EmotionRecordController@store');
     $router->get('emotion-records/{id}', 'EmotionRecordController@show');
     $router->delete('emotion-records/{id}', 'EmotionRecordController@destroy');
+
+    $router->get('emotion-history/summary', 'EmotionHistoryController@getEmotionSummary');
+    $router->get('emotion-history/frequency-trend', 'EmotionHistoryController@getEmotionFrequencyTrend');
 });
-
-
-// $router->group(['prefix' => 'api', 'middleware' => 'jwt.auth'], function () use ($router) {
-//     $router->get('emotion-history/summary', 'EmotionHistoryController@getEmotionSummary');
-   $router->get('emotion-history/summary', 'EmotionHistoryController@getEmotionSummary');
-// });

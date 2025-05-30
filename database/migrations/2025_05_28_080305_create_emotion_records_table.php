@@ -16,14 +16,13 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamp('detection_timestamp');
             $table->string('dominant_emotion');
-            $table->decimal('happines_score', 5, 4)->default(0);
+            $table->decimal('happiness_score', 5, 4)->default(0); // Perhatikan typo: 'happines_score'
             $table->decimal('sadness_score', 5, 4)->default(0);
             $table->decimal('anger_score', 5, 4)->default(0);
             $table->decimal('fear_score', 5, 4)->default(0);
             $table->decimal('disgust_score', 5, 4)->default(0);
             $table->decimal('surprise_score', 5, 4)->default(0);
             $table->decimal('neutral_score', 5, 4)->default(0);
-            $table->unsignedTinyInteger('age')->nullable();
             $table->string('gender', 10)->nullable();
             $table->decimal('gender_probability', 5, 4)->nullable();
             $table->index('detection_timestamp');
