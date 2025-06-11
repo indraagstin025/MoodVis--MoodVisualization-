@@ -108,6 +108,7 @@ $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'jwt.auth' => App\Http\Middleware\JwtMiddleware::class,
     'jwt.refresh' => App\Http\Middleware\RefreshTokenMiddleware::class,
+    'admin' => App\Http\Middleware\IsAdmin::class, //
 ]);
 
 /*

@@ -11,51 +11,47 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 class AuthController extends Controller
 {
     /**
-     * Register a new user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * Mendaftarkan pengguna baru.
+     * Validasi dilakukan di luar try-catch untuk respons error 422 yang detail.
      */
-    public function register(Request $request)
-    {
-        $this->validate($request, [
-            'username' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+public function register(Request $request)
+{
+    // ... (validasi tetap sama)
+    $this->validate($request, [
+        'name' => 'required|string|max:100',
+        'email' => 'required|string|email|max:255|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+
+    try {
+        $user = \App\Models\User::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')),
+            'role' => 'murid', // <--- TAMBAHKAN BARIS INI HANYA UNTUK TES
         ]);
 
-        /** @var \App\Models\User $user  */
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User registered successfully (manual role test).',
+            'user' => $user->only(['id', 'name', 'email', 'role']),
+        ], 201);
 
-        try {
-            $user = User::create([
-                'username' => $request->input('username'),
-                'email' => $request->input('email'),
-                'password' => Hash::make($request->input('password')),
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'User registered successfully. Please log in.',
-                'user' => $user->only(['id', 'username', 'email']),
-            ], 201);
         } catch (\Exception $e) {
+            // Menangani error tak terduga (misalnya koneksi database gagal)
             return response()->json([
                 'status' => 'error',
-                'message' => 'User registration failed.',
-                'details' => $e->getMessage()
-            ], 409);
+                'message' => 'An unexpected error occurred during registration.',
+            ], 500);
         }
     }
 
     /**
-     * Authenticate a user and return a JWT.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     *
+     * Melakukan login pengguna dan mengembalikan token JWT.
      */
     public function login(Request $request)
     {
+        // Validasi kredensial. Jika gagal, otomatis mengembalikan JSON error 422.
         $this->validate($request, [
             'email' => 'required|string|email',
             'password' => 'required|string',
@@ -64,93 +60,88 @@ class AuthController extends Controller
         $credentials = $request->only(['email', 'password']);
 
         try {
-
             $user = User::where('email', $credentials['email'])->first();
 
-            if (!$user) {
-
-                return response()->json(['status' => 'error', 'message' => 'Email tidak terdaftar.'], 401);
+            // Cek jika user tidak ada atau password salah
+            if (!$user || !Hash::check($credentials['password'], $user->password)) {
+                 return response()->json([
+                    'status' => 'error',
+                    'message' => 'Email atau password yang Anda masukkan salah.'
+                ], 401);
             }
 
-
-            if (!Hash::check($credentials['password'], $user->password)) {
-
-                return response()->json(['status' => 'error', 'message' => 'Password salah.'], 401);
-            }
-
-
-            if (! $token = JWTAuth::attempt($credentials)) {
-
-
+            // Membuat token dari data user yang sudah diverifikasi
+            if (! $token = JWTAuth::fromUser($user)) {
                 return response()->json(['status' => 'error', 'message' => 'Gagal membuat token autentikasi.'], 401);
             }
-        } catch (JWTException $e) {
 
-            return response()->json(['status' => 'error', 'message' => 'Terjadi kesalahan server saat login, tidak dapat membuat token.'], 500);
+        } catch (JWTException $e) {
+            return response()->json(['status' => 'error', 'message' => 'Terjadi kesalahan pada server saat proses login.'], 500);
         }
 
-
+        // Mengembalikan respons sukses dengan token dan data user (termasuk role)
         return response()->json([
             'status' => 'success',
             'message' => 'Login berhasil',
-
-            /** @var \App\Models\User $user */
-
-            'user' => auth()->user()->only(['id', 'username', 'email']),
+            // BENAR: Gunakan variabel $user yang sudah pasti ada
+            'user' => $user->only(['id', 'name', 'email', 'photo_url', 'role']),
             'token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 60
+            'expires_in' => JWTAuth::factory()->getTTL() * 60 // Durasi token dalam detik
         ]);
     }
 
     /**
-     * Get the authenticated User's data.
-     * This route will be protected by 'jwt.auth' middleware.
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * Mendapatkan data pengguna yang sedang terautentikasi.
      */
     public function me()
     {
         return response()->json([
             'status' => 'success',
-
-        /** @var \App\Models\User $user */
-
-            'user' => auth()->user()->only(['id', 'username', 'email'])
+            'user' => auth()->user()->only(['id', 'name', 'email', 'photo_url', 'role'])
         ]);
     }
 
     /**
-     * Log the user out (Invalidate the token).
-     * This route will be protected by 'jwt.auth' middleware.
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * Melakukan logout dengan membatalkan token saat ini.
      */
     public function logout()
     {
         try {
             JWTAuth::invalidate(JWTAuth::getToken());
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Successfully logged out'
-            ]);
-        } catch (JWTException $e) {
-            return response()->json(['status' => 'error', 'message' => 'Failed to logout'], 500);
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Logout failed, please try again.'
+            ], 500);
         }
     }
 
     /**
-     * Refresh a token.
-     * This route will be protected by 'jwt.refresh' middleware.
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * Memperbarui token yang sudah ada.
      */
     public function refresh()
     {
+        try {
+            $newToken = JWTAuth::parseToken()->refresh();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Token refreshed successfully. Check Authorization header for new token.'
-        ]);
+            return response()->json([
+                'status' => 'success',
+                'token' => $newToken,
+                'token_type' => 'bearer',
+                'expires_in' => JWTAuth::factory()->getTTL() * 60
+            ]);
+        } catch (JWTException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token refresh failed.',
+                'details' => $e->getMessage()
+            ], 401);
+        }
     }
 }

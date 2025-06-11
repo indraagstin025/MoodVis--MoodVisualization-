@@ -9,7 +9,9 @@
         "fruitcake/laravel-cors": "dev-develop",
         "illuminate/http": "^10.48",
         "laravel/lumen-framework": "^10.0",
-        "tymon/jwt-auth": "^2.2"
+        "tymon/jwt-auth": "^2.2",
+        "league/flysystem-unix-visibility": "^3.0"
+
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
