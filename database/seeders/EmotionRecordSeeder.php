@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\EmotionRecord;
 use App\Models\User;
+use App\Models\EmotionRecord;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class EmotionRecordSeeder extends Seeder
@@ -16,83 +17,50 @@ class EmotionRecordSeeder extends Seeder
      */
     public function run()
     {
-        // Opsional: Kosongkan tabel emotion_records sebelum seeding jika diperlukan
-        // EmotionRecord::truncate(); // Hati-hati, ini menghapus semua data di tabel ini
+        // 1. Kosongkan tabel emotion_records terlebih dahulu
+        Schema::disableForeignKeyConstraints();
+        EmotionRecord::truncate();
+        Schema::enableForeignKeyConstraints();
 
-        $users = User::take(2)->pluck('id')->toArray();
+        // 2. Ambil semua ID pengguna dengan peran 'murid'
+        $studentIds = User::where('role', 'murid')->pluck('id');
 
-        if (empty($users)) {
-            $this->command->error('Tidak ada user ditemukan di database. Mohon buat user terlebih dahulu atau jalankan UserSeeder.');
-            if (empty($users)) return;
+        if ($studentIds->isEmpty()) {
+            $this->command->info('Tidak ada murid ditemukan, seeder data emosi dilewati.');
+            return;
         }
 
-        $this->command->info('Memulai EmotionRecordSeeder untuk user ID: ' . implode(', ', $users));
+        // PERBAIKAN: Daftar emosi disamakan dengan nama kolom di database
+        $emotions = ['happiness', 'sadness', 'anger', 'fear', 'disgust', 'surprise', 'neutral'];
 
-        $possibleEmotions = ['happy', 'sad', 'neutral', 'angry', 'surprised', 'fearful', 'disgusted'];
-        $genders = ['male', 'female'];
+        // 3. Loop setiap murid dan buat data emosi untuk mereka
+        foreach ($studentIds as $studentId) {
+            // Buat antara 10 sampai 25 record untuk setiap murid
+            $numberOfRecords = rand(10, 25);
 
-        // Tentukan rentang tanggal spesifik untuk data dummy (1 Juni - 7 Juni 2025)
-        $startDate = Carbon::create(2025, 6, 1);
-        $numberOfDaysToSeed = 7;
+            for ($i = 0; $i < $numberOfRecords; $i++) {
+                $dominantEmotion = $emotions[array_rand($emotions)];
 
-        foreach ($users as $userId) {
-            $this->command->info("Membuat data untuk user ID: {$userId}");
-            for ($dayOffset = 0; $dayOffset < $numberOfDaysToSeed; $dayOffset++) {
-                $currentLoopDate = $startDate->copy()->addDays($dayOffset);
-
-                $recordsPerDay = rand(2, 4); // Buat 2-4 record per hari
-                $this->command->info("   -- Tanggal: {$currentLoopDate->toDateString()}, {$recordsPerDay} records");
-
-                for ($i = 0; $i < $recordsPerDay; $i++) {
-                    $dominantEmotion = 'happy'; // Default ke happy
-                    // 70% kemungkinan happy menjadi emosi dominan
-                    if (rand(1, 100) > 30) {
-                        $dominantEmotion = 'happy';
-                    } else {
-                        // Jika bukan happy, pilih emosi lain secara acak
-                        $otherEmotions = array_diff($possibleEmotions, ['happy']);
-                        $dominantEmotion = $otherEmotions[array_rand($otherEmotions)];
-                    }
-
-                    // Buat timestamp acak dalam jam kerja (08:00 - 22:00) pada $currentLoopDate
-                    $detectionTimestamp = $currentLoopDate->copy()
-                                                ->setHour(rand(8, 22))
-                                                ->setMinute(rand(0, 59))
-                                                ->setSecond(rand(0, 59));
-
-                    $expressions = [];
-                    foreach ($possibleEmotions as $emotion) {
-                        $score = round(mt_rand(0, 50) / 100, 4); // Skor default lebih rendah
-                        if ($emotion === $dominantEmotion) {
-                            if ($emotion === 'happy') {
-                                $score = round(mt_rand(90, 100) / 100, 4); // Happy dominan: skor sangat tinggi
-                            } else {
-                                $score = round(mt_rand(65, 100) / 100, 4); // Emosi lain dominan: skor tinggi
-                            }
-                        } elseif ($emotion === 'happy') {
-                            // Jika happy bukan dominan, tetap berikan skor yang lumayan
-                            $score = round(mt_rand(35, 75) / 100, 4);
-                        }
-                        $expressions[$emotion . '_score'] = $score;
-                    }
-
-                    EmotionRecord::create([
-                        'user_id' => $userId,
-                        'detection_timestamp' => $detectionTimestamp,
-                        'dominant_emotion' => $dominantEmotion,
-                        'happiness_score' => $expressions['happy_score'],
-                        'sadness_score'   => $expressions['sad_score'],
-                        'anger_score'     => $expressions['angry_score'],
-                        'fear_score'      => $expressions['fearful_score'],
-                        'disgust_score'   => $expressions['disgusted_score'],
-                        'surprise_score'  => $expressions['surprised_score'],
-                        'neutral_score'   => $expressions['neutral_score'],
-                        'gender' => $genders[array_rand($genders)],
-                        'gender_probability' => round(mt_rand(75, 100) / 100, 4),
-                    ]);
+                // Buat skor acak, dan pastikan skor dominan lebih tinggi
+                $scores = [];
+                foreach ($emotions as $emotion) {
+                    $scores[$emotion . '_score'] = mt_rand(0, 70) / 100;
                 }
+                $scores[$dominantEmotion . '_score'] = mt_rand(80, 100) / 100;
+
+                // Buat timestamp acak dalam 30 hari terakhir dari hari ini.
+                $randomDaysAgo = rand(0, 29);
+                $randomTimestamp = Carbon::now()->subDays($randomDaysAgo);
+
+                EmotionRecord::create(array_merge([
+                    'user_id' => $studentId,
+                    'detection_timestamp' => $randomTimestamp,
+                    'dominant_emotion' => $dominantEmotion,
+                    'gender' => ['male', 'female'][array_rand(['male', 'female'])],
+                    'gender_probability' => mt_rand(70, 100) / 100,
+                ], $scores));
             }
         }
-        $this->command->info('EmotionRecordSeeder berhasil dijalankan. Data dummy dengan dominasi "happy" telah dibuat.');
+        $this->command->info('Seeder data emosi untuk semua murid berhasil dijalankan!');
     }
 }

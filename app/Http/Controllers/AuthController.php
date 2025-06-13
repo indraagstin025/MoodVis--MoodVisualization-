@@ -14,31 +14,43 @@ class AuthController extends Controller
      * Mendaftarkan pengguna baru.
      * Validasi dilakukan di luar try-catch untuk respons error 422 yang detail.
      */
-public function register(Request $request)
-{
-    // ... (validasi tetap sama)
-    $this->validate($request, [
-        'name' => 'required|string|max:100',
-        'email' => 'required|string|email|max:255|unique:users,email',
-        'password' => 'required|string|min:8|confirmed',
-    ]);
 
-    try {
-        $user = \App\Models\User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
-            'role' => 'murid', // <--- TAMBAHKAN BARIS INI HANYA UNTUK TES
+    public function register(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|string|max:100',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'User registered successfully (manual role test).',
-            'user' => $user->only(['id', 'name', 'email', 'role']),
-        ], 201);
+        try {
 
+            $teacher = User::where('role', 'pengajar')
+                ->withCount('students')
+                ->orderBy('students_count', 'asc')
+                ->first();
+
+            if (!$teacher) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No teachers available in the system.',
+                ], 500);
+            }
+
+            $user = User::create([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => Hash::make($request->input('password')),
+                'role' => 'murid',
+                'teacher_id' => $teacher->id
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User registered successfully',
+                'user' => $user->only(['id', 'name', 'email', 'role', 'teacher_id']),
+            ], 201);
         } catch (\Exception $e) {
-            // Menangani error tak terduga (misalnya koneksi database gagal)
             return response()->json([
                 'status' => 'error',
                 'message' => 'An unexpected error occurred during registration.',
@@ -51,7 +63,7 @@ public function register(Request $request)
      */
     public function login(Request $request)
     {
-        // Validasi kredensial. Jika gagal, otomatis mengembalikan JSON error 422.
+
         $this->validate($request, [
             'email' => 'required|string|email',
             'password' => 'required|string',
@@ -62,32 +74,31 @@ public function register(Request $request)
         try {
             $user = User::where('email', $credentials['email'])->first();
 
-            // Cek jika user tidak ada atau password salah
+
             if (!$user || !Hash::check($credentials['password'], $user->password)) {
-                 return response()->json([
+                return response()->json([
                     'status' => 'error',
                     'message' => 'Email atau password yang Anda masukkan salah.'
                 ], 401);
             }
 
-            // Membuat token dari data user yang sudah diverifikasi
+
             if (! $token = JWTAuth::fromUser($user)) {
                 return response()->json(['status' => 'error', 'message' => 'Gagal membuat token autentikasi.'], 401);
             }
-
         } catch (JWTException $e) {
             return response()->json(['status' => 'error', 'message' => 'Terjadi kesalahan pada server saat proses login.'], 500);
         }
 
-        // Mengembalikan respons sukses dengan token dan data user (termasuk role)
+
         return response()->json([
             'status' => 'success',
             'message' => 'Login berhasil',
-            // BENAR: Gunakan variabel $user yang sudah pasti ada
+
             'user' => $user->only(['id', 'name', 'email', 'photo_url', 'role']),
             'token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 60 // Durasi token dalam detik
+            'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
     }
 

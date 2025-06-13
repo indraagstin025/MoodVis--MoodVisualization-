@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Support\Facades\URL; // Dikembalikan sesuai kode asli
+use Illuminate\Support\Facades\URL;
 
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
@@ -22,8 +22,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var string[]
      */
     protected $fillable = [
-        'name', 'email', 'password', 'photo',
-        'role', // Perubahan: 'role' ditambahkan
+        'name',
+        'email',
+        'password',
+        'photo',
+        'role',
+        'teacher_id',
     ];
 
     /**
@@ -40,12 +44,39 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function getPhotoUrlAttribute()
     {
-    if ($this->photo) {
-        // PERUBAHAN KUNCI DI SINI:
-        // Buat URL langsung ke folder 'profile' di dalam 'public'
-        return URL::asset('profile/' . $this->photo);
+        if ($this->photo) {
+
+
+            return URL::asset('profile/' . $this->photo);
+        }
+        return null;
     }
-    return null;
+
+    /**
+     * Mendapatkan data pengajar yang membimbing murid ini.
+     * (Relasi untuk murid)
+     */
+    public function teacher()
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+
+     public function class()
+    {
+        // Nama relasi adalah 'class', merujuk ke model 'Classes',
+        // dengan foreign key 'class_id'.
+        return $this->belongsTo(Classes::class, 'class_id');
+    }
+
+
+    /**
+     * Mendapatkan semua murid yang dibimbing oleh pengajar ini.
+     * (Relasi untuk pengajar)
+     */
+    public function students()
+    {
+        return $this->hasMany(User::class, 'teacher_id');
     }
 
 
@@ -66,13 +97,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function getJWTCustomClaims()
     {
-        // Perubahan: Menambahkan 'role' ke dalam payload JWT
+
         return [
             'role' => $this->role,
         ];
     }
 
-    // --- FUNGSI BANTUAN UNTUK ROLE ---
+
 
     /**
      * Cek apakah user adalah admin.

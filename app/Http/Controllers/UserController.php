@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -14,15 +15,15 @@ class UserController extends Controller
      */
     public function createUser(Request $request)
     {
-        // 1. Validasi input dari form admin
+
         $this->validate($request, [
             'name' => 'required|string|max:100',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
-            'role' => 'required|string|in:murid,pengajar' // Hanya izinkan membuat murid atau guru
+            'role' => 'required|string|in:murid,pengajar'
         ]);
 
-        // 2. Buat pengguna baru jika validasi berhasil
+
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
@@ -30,7 +31,7 @@ class UserController extends Controller
             'role' => $request->input('role'),
         ]);
 
-        // 3. Kirim respons sukses dalam format JSON
+
         return response()->json([
             'status' => 'success',
             'message' => 'Pengguna baru berhasil dibuat oleh admin.',
@@ -38,12 +39,16 @@ class UserController extends Controller
         ], 201);
     }
 
-     public function index()
+    public function index()
     {
-        // Ambil semua pengguna, urutkan dari yang terbaru,
-        // dan pilih hanya kolom yang relevan untuk ditampilkan
+
+
         $users = User::orderBy('created_at', 'desc')->get([
-            'id', 'name', 'email', 'role', 'created_at'
+            'id',
+            'name',
+            'email',
+            'role',
+            'created_at'
         ]);
 
         return response()->json([
@@ -52,12 +57,70 @@ class UserController extends Controller
         ]);
     }
 
-        public function test()
+
+    /**
+     * Mengambil satu pengguna spesifik berdasarkan ID.
+     */
+    public function getUser($id)
+    {
+
+        $user = User::find($id);
+
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Pengguna tidak ditemukan.'
+            ], 404);
+        }
+
+
+        return response()->json([
+            'status' => 'success',
+            'user' => $user->only(['id', 'name', 'email', 'role', 'created_at'])
+        ]);
+    }
+
+    /**
+     * Mengambil semua murid untuk pengajar yang sedang login.
+     * Fungsi ini mengambil semua pengguna dengan peran 'murid'.
+     * Untuk relasi spesifik pengajar-murid, diperlukan modifikasi skema database.
+     */
+    public function getMyStudents(Request $request)
+    {
+
+        $teacher = Auth::user();
+
+
+        if (!$teacher || $teacher->role !== 'pengajar') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Akses ditolak. Hanya pengajar yang dapat mengakses fitur ini.'
+            ], 403);
+        }
+
+
+        $query = User::where('teacher_id', $teacher->id);
+
+
+        if ($request->has('class_id') && $request->input('class_id') != '') {
+            $query->where('class_id', $request->input('class_id'));
+        }
+
+
+        $students = $query->orderBy('name', 'asc')
+            ->with('class:id,name')
+            ->get(['id', 'name', 'email', 'photo', 'class_id']);
+
+
+        return response()->json(['status' => 'success', 'students' => $students]);
+    }
+
+    /**
+     * Endpoint untuk testing.
+     */
+    public function test()
     {
         return response()->json(['status' => 'success', 'message' => 'UserController berhasil diakses!']);
     }
-
-    // Nanti Anda bisa menambahkan fungsi lain di sini, misalnya:
-    // public function deleteUser($id) { ... }
-    // public function updateUserByAdmin($id, Request $request) { ... }
 }

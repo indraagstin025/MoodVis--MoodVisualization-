@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models; // Sesuaikan namespace jika Anda menggunakan struktur folder berbeda (misal App\)
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory; // Opsional, jika Anda menggunakan factories
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class EmotionRecord extends Model
 {
-    // use HasFactory; // Uncomment jika Anda menggunakan model factories
+
 
     /**
      * Nama tabel yang terhubung dengan model.
@@ -43,7 +43,7 @@ class EmotionRecord extends Model
      */
     protected $casts = [
         'detection_timestamp' => 'datetime',
-        'happines_score' => 'float', // Jika typo diperbaiki. Jika tidak, ganti menjadi 'happines_score'
+        'happines_score' => 'float',
         'sadness_score' => 'float',
         'anger_score' => 'float',
         'fear_score' => 'float',
@@ -60,7 +60,7 @@ class EmotionRecord extends Model
      */
     public function user()
     {
-        // Pastikan model User ada di App\Models\User atau App\User
+
         return $this->belongsTo(User::class, 'user_id');
     }
 }

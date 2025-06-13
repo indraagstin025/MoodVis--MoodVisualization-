@@ -45,6 +45,7 @@ $app->configure('database');
 $app->configure('app');
 $app->configure('auth');
 $app->configure('jwt');
+$app->configure('dompdf');
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +86,7 @@ $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 // $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+$app->register(\Barryvdh\DomPDF\ServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -108,7 +110,9 @@ $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'jwt.auth' => App\Http\Middleware\JwtMiddleware::class,
     'jwt.refresh' => App\Http\Middleware\RefreshTokenMiddleware::class,
-    'admin' => App\Http\Middleware\IsAdmin::class, //
+    'admin' => App\Http\Middleware\IsAdmin::class,
+    'role' => App\Http\Middleware\RoleMiddleware::class,
+
 ]);
 
 /*

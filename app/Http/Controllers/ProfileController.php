@@ -8,11 +8,13 @@ class ProfileController extends Controller
 {
     public function update(Request $request)
     {
+
         // Validasi Anda, ini sudah benar.
         $this->validate($request, [
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . auth()->id(),
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+             'class_id' => 'sometimes|nullable|integer|exists:classes,id'
         ]);
 
         $user = \App\Models\User::find(auth()->id());
@@ -52,7 +54,7 @@ class ProfileController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Profile updated',
-            'user' => $user->only(['id', 'name', 'email', 'photo_url', 'role']),
+            'user' => $user->only(['id', 'name', 'email', 'photo_url','class_id', 'role']),
         ]);
     }
 }
