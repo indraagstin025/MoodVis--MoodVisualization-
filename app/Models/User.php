@@ -62,12 +62,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     }
 
 
-     public function class()
-    {
-        // Nama relasi adalah 'class', merujuk ke model 'Classes',
-        // dengan foreign key 'class_id'.
-        return $this->belongsTo(Classes::class, 'class_id');
-    }
 
 
     /**
@@ -78,6 +72,26 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->hasMany(User::class, 'teacher_id');
     }
+
+    /**
+ * Relasi untuk MURID ke kelasnya.
+ * Menjawab pertanyaan: "Murid ini ada di kelas mana?"
+ */
+public function class()
+{
+    // Menggunakan class_id sebagai foreign key
+    return $this->belongsTo(Classes::class, 'class_id');
+}
+
+/**
+ * Relasi untuk GURU sebagai wali kelas.
+ * Menjawab pertanyaan: "Kelas mana yang diampu oleh guru ini?"
+ */
+public function homeroomClass()
+{
+    // Menggunakan teacher_id sebagai foreign key di tabel classes
+    return $this->hasOne(Classes::class, 'teacher_id');
+}
 
 
     /**

@@ -39,9 +39,9 @@ class ReportController extends Controller
         ]);
 
         $student = User::find($validated['student_id']);
-        if (!$student || $student->role !== 'murid' || $student->teacher_id != $teacher->id) {
-            return response()->json(['message' => 'Siswa tidak valid.'], 404);
-        }
+if (!$student || $student->role !== 'murid' || !$student->class || $student->class->teacher_id != $teacher->id) {
+    return response()->json(['message' => 'Siswa tidak valid atau bukan bagian dari kelas Anda.'], 404);
+}
 
         $historyController = new EmotionHistoryController();
         $studentId = $student->id;

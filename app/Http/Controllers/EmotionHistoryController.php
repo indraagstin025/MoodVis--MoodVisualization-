@@ -131,9 +131,9 @@ public function getEmotionFrequencyTrend(Request $request, $userId = null)
     }
 
     if ($requestingUser->role === 'pengajar') {
-        if ($targetUser->teacher_id != $requestingUser->id) {
-            return response()->json(['message' => 'Akses ditolak. Anda bukan guru pembimbing dari siswa ini.'], 403);
-        }
+if (!$targetUser->class || $targetUser->class->teacher_id != $requestingUser->id) {
+        return response()->json(['message' => 'Akses ditolak. Anda bukan guru pembimbing dari siswa ini.'], 403);
+    }
     }
     else if ($requestingUser->role === 'murid') {
         if ($requestingUser->id != $targetUserId) {

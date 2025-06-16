@@ -3,196 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Analisis Emosi Siswa - Format Surat</title>
+    <title>Laporan Analisis Emosi Siswa</title>
     <style>
+        /* Menggunakan font sans-serif yang modern dan mudah dibaca */
+        @page { margin: 40px; }
         body {
-            font-family: 'Times New Roman', Times, serif; /* Font klasik untuk surat */
-            color: #222;
-            line-height: 1.7; /* Spasi baris yang lebih longgar */
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-            font-size: 11pt; /* Ukuran font standar untuk surat */
-        }
-        .letter-container {
-            padding: 40px 60px; /* Padding lebih besar untuk kesan formal */
-            max-width: 800px;
-            margin: 30px auto;
+            font-family: 'Helvetica Neue', 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.6;
             background-color: #ffffff;
-            border: 1px solid #d0d0d0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* Shadow yang lebih jelas */
-            border-radius: 5px; /* Sedikit radius untuk sudut */
+            font-size: 10pt;
         }
+        .report-container {
+            width: 100%;
+        }
+        /* Header utama laporan dengan warna HIJAU TUA */
         .header {
-            text-align: center;
-            margin-bottom: 40px;
+            background-color: #15803d; /* Warna Hijau Tua Profesional */
+            color: #ffffff;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            text-align: left;
         }
         .header h1 {
             margin: 0;
-            color: #1a5a8e; /* Warna biru gelap */
-            font-size: 1.8em; /* Ukuran H1 lebih kecil, fokus pada keseriusan */
+            font-size: 22pt;
             font-weight: bold;
-            text-transform: uppercase;
             letter-spacing: 1px;
-            border-bottom: 2px solid #1a5a8e;
-            padding-bottom: 10px;
-            display: inline-block; /* Agar border hanya sepanjang teks */
         }
         .header p {
             margin: 5px 0 0;
-            font-size: 0.9em;
+            font-size: 11pt;
+            opacity: 0.9;
+        }
+        /* Kontainer untuk informasi utama dengan aksen HIJAU */
+        .info-grid {
+            margin-bottom: 30px;
+        }
+        .info-card {
+            background-color: #f0fdf4; /* Latar belakang hijau sangat muda */
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #22c55e; /* Aksen Hijau Cerah */
+        }
+        .info-card .label {
+            display: block;
+            font-size: 9pt;
             color: #555;
+            margin-bottom: 2px;
+            text-transform: uppercase;
         }
-        .address-block, .date-block {
-            margin-bottom: 20px;
-        }
-        .date-block {
-            text-align: right;
-        }
-        .salutation {
-            margin-bottom: 25px;
-        }
-        .content-paragraph {
-            margin-bottom: 15px;
-            text-align: justify;
-        }
-        /* CSS baru untuk tabel informasi formal */
-        .info-table-formal {
-            width: 100%;
-            margin-bottom: 25px; /* Margin bawah sedikit lebih besar */
-            border-collapse: collapse; /* Menghilangkan spasi antar sel */
-        }
-        .info-table-formal td {
-            padding: 5px 0; /* Padding vertikal saja, horizontal diatur di label-column */
-            vertical-align: top; /* Pastikan konten sel sejajar di atas */
-        }
-        .info-table-formal .label-column {
-            width: 220px; /* Lebar tetap untuk kolom label agar align rapi */
-            padding-right: 15px; /* Spasi antara label dan tanda titik dua */
-        }
-        .info-table-formal strong {
-            color: #333;
-        }
-        .section-title {
-            font-size: 1.2em;
+        .info-card .value {
+            display: block;
+            font-size: 12pt;
             font-weight: bold;
-            color: #1a5a8e;
+            color: #111;
+        }
+        /* Judul untuk setiap seksi dengan warna HIJAU TUA */
+        .section-title {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #15803d; /* Warna Hijau Tua Profesional */
             margin-top: 30px;
             margin-bottom: 10px;
-            border-bottom: 1px dashed #ccc; /* Garis putus-putus */
-            padding-bottom: 5px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+        .content-paragraph {
+            margin-bottom: 20px;
+            text-align: justify;
         }
         .chart-container {
             text-align: center;
-            margin-top: 25px;
-            background-color: #fcfcfc;
-            padding: 15px;
+            margin-top: 20px;
+            padding: 20px;
             border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            page-break-inside: avoid; /* Menjaga chart tidak terpotong */
         }
         .chart-container img {
-            max-width: 100%;
+            max-width: 95%;
             height: auto;
-            display: block;
-            margin: 0 auto;
-            border-radius: 3px;
         }
-        .closing, .signature {
-            margin-top: 35px;
-            text-align: left;
-        }
-        .signature {
-            margin-top: 50px; /* Ruang untuk tanda tangan */
-        }
+        /* Penekanan dengan warna HIJAU CERAH */
         .important-note {
             font-weight: bold;
-            color: #a00; /* Warna merah gelap untuk penekanan */
+            color: #16a34a; /* Warna Hijau sebagai penekanan */
+            text-transform: uppercase;
         }
-        .disclaimer {
-            font-size: 0.85em;
-            color: #888;
-            margin-top: 40px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
+       .footer {
+            position: fixed; /* Membuat posisi footer tetap */
+            bottom: 0px;     /* Menempatkannya di bagian paling bawah halaman */
+            left: 0px;       /* Membentang dari kiri */
+            right: 0px;      /* Sampai kanan */
+            height: 50px;    /* Memberi tinggi pada area footer */
+
+            /* Styling tambahan agar rapi */
+            font-size: 8pt;
+            color: #999;
             text-align: center;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 10px;
+            background-color: #ffffff; /* Beri background untuk menutupi teks di belakangnya */
         }
+
+        /* Helper untuk layout tabel/grid */
+        table { width: 100%; border-collapse: collapse; }
+        td { vertical-align: top; padding: 0; }
+        .w-1-3 { width: 33.33%; }
+        .px-1 { padding-left: 4px; padding-right: 4px; }
+
+        /* === KELAS CSS BARU UNTUK MEMAKSA PINDAH HALAMAN === */
+        .new-page {
+            page-break-before: always;
+        }
+        /* =================================================== */
     </style>
 </head>
 <body>
-    <div class="letter-container">
+    <div class="report-container">
+        <!-- HEADER LAPORAN -->
         <div class="header">
-            <h1>Laporan Analisis Emosi Siswa</h1>
+            <h1>Laporan Analisis Emosi</h1>
             <p>Sistem Aplikasi MoodVis</p>
         </div>
 
-        <div class="date-block">
-            Bandung, {{ \Carbon\Carbon::parse($printDate)->isoFormat('D MMMM YYYY') }}
-        </div>
-
-        <div class="address-block">
-            Kepada Yth. Bapak/Ibu Wali Murid<br>
-            Sdr/i. {{ $studentName ?? 'Nama Siswa/i' }}<br>
-            Di Tempat
-        </div>
-
-        <div class="salutation">
-            Dengan hormat,
-        </div>
-
-        <div class="content-paragraph">
-            Melalui surat laporan ini, kami dengan bangga menyampaikan hasil analisis emosi ananda {{ $studentName ?? 'siswa/i' }} yang telah terekam secara otomatis oleh Sistem Aplikasi MoodVis kami selama periode pelaporan <span style="font-weight: bold;">{{ $reportPeriod ?? 'belum tersedia' }}</span>. Laporan ini disusun sebagai bentuk transparansi dan upaya kami dalam memahami serta mendukung perkembangan emosional setiap siswa/i.
-        </div>
-
-        <div class="section-title">Informasi Umum Siswa/i</div>
-        <table class="info-table-formal">
+        <!-- INFORMASI UTAMA DALAM BENTUK KARTU -->
+        <table class="info-grid">
             <tr>
-                <td class="label-column"><strong>Nama Lengkap Siswa/i</strong></td>
-                <td>: {{ $studentName ?? 'Belum Teridentifikasi' }}</td>
-            </tr>
-            <tr>
-                <td class="label-column"><strong>Periode Data Analisis</strong></td>
-                <td>: {{ $reportPeriod ?? 'Periode Tidak Tersedia' }}</td>
-            </tr>
-            <tr>
-                <td class="label-column"><strong>Tanggal Pencetakan Laporan</strong></td>
-                <td>: {{ \Carbon\Carbon::parse($printDate)->isoFormat('D MMMM YYYY [pukul] HH:mm') }} WIB</td>
+                <td class="w-1-3 px-1">
+                    <div class="info-card">
+                        <span class="label">Nama Siswa</span>
+                        <span class="value">{{ $studentName ?? 'Belum Teridentifikasi' }}</span>
+                    </div>
+                </td>
+                <td class="w-1-3 px-1">
+                    <div class="info-card">
+                        <span class="label">Periode Analisis</span>
+                        <span class="value">{{ $reportPeriod ?? 'Tidak Tersedia' }}</span>
+                    </div>
+                </td>
+                <td class="w-1-3 px-1">
+                    <div class="info-card">
+                        <span class="label">Tanggal Laporan</span>
+                        <span class="value">{{ \Carbon\Carbon::parse($printDate)->isoFormat('D MMMM YYYY') }}</span>
+                    </div>
+                </td>
             </tr>
         </table>
 
-        <div class="section-title">Ringkasan Utama Perkembangan Emosi</div>
+        <!-- RINGKASAN UTAMA -->
+        <div class="section-title">Ringkasan Utama</div>
         <div class="content-paragraph">
-            Berdasarkan kompilasi data yang cermat dari catatan harian emosi, kami mengidentifikasi bahwa <span class="important-note">emosi <span style="text-transform: uppercase;">{{ ucfirst($summaryEmotion) ?? 'belum ada data yang cukup' }}</span> merupakan emosi dominan</span> yang paling sering terekam dari ananda {{ $studentName ?? 'siswa/i' }} selama periode pengamatan ini. Temuan ini menyediakan wawasan awal yang krusial mengenai kecenderungan emosional yang diperlihatkan oleh ananda. Kami senantiasa berkomitmen untuk memantau tren ini lebih lanjut dan siap untuk memberikan bimbingan serta dukungan yang diperlukan untuk membantu ananda mengelola dan mengembangkan emosi secara positif.
+            Berdasarkan kompilasi data dari catatan harian emosi, teridentifikasi bahwa <span class="important-note">{{ ucfirst($summaryEmotion) ?? 'belum ada data' }}</span> merupakan emosi yang paling dominan terekam dari {{ $studentName ?? 'siswa' }} selama periode pengamatan. Temuan ini menyediakan wawasan awal mengenai kecenderungan emosional yang diperlihatkan.
         </div>
 
-        <div class="section-title">Visualisasi Tren Frekuensi Emosi</div>
+        <!-- VISUALISASI GRAFIK -->
+        <div class="section-title">Visualisasi Tren Emosi</div>
         <div class="content-paragraph">
-            Untuk memberikan gambaran yang lebih visual dan mudah dipahami mengenai fluktuasi emosi ananda, berikut kami lampirkan grafik tren frekuensi emosi selama periode pelaporan.
+            Grafik berikut menyajikan gambaran visual mengenai fluktuasi frekuensi emosi ananda selama periode pelaporan untuk pemahaman yang lebih mendalam.
         </div>
         <div class="chart-container">
-            @if($chartImageBase64)
+            @if(isset($chartImageBase64) && $chartImageBase64)
                 <img src="{{ $chartImageBase64 }}" alt="Grafik Tren Emosi Siswa">
             @else
-                <p>Mohon maaf, tidak ada data yang memadai untuk menghasilkan grafik tren emosi pada periode ini. Pastikan ananda telah melakukan pencatatan emosi secara rutin.</p>
+                <p style="color: #777; padding: 50px 0;">Tidak ada data yang memadai untuk menghasilkan grafik tren emosi pada periode ini.</p>
             @endif
         </div>
 
-        <div class="closing">
-            Demikian laporan analisis emosi ini kami sampaikan. Kami berharap laporan ini dapat menjadi bahan diskusi dan evaluasi yang konstruktif bagi Bapak/Ibu Wali Murid dan ananda sekalian.
-        </div>
+        <!-- === WRAPPER BARU UNTUK MEMINDAHKAN KONTEN KE HALAMAN BARU === -->
+        <div class="new-page">
+            <!-- CATATAN PENUTUP -->
+            <div class="section-title">Catatan & Rekomendasi</div>
+            <div class="content-paragraph">
+                Laporan ini bertujuan untuk menjadi panduan awal dalam memahami kondisi emosional siswa. Diskusi lebih lanjut antara guru, orang tua, dan siswa sangat dianjurkan untuk mendukung perkembangan emosional yang positif. Jika ada tren emosi negatif yang konsisten, disarankan untuk berkonsultasi dengan konselor sekolah.
+            </div>
 
-        <div class="signature">
-            Hormat kami,<br>
-            Tim MoodVis<br>
-            [Nama Sekolah/Institusi, jika relevan]<br>
-            <br><br><br>
-            (Tanda Tangan & Nama Jelas)<br>
-            <span style="font-size: 0.9em; color: #555;">[Posisi/Jabatan, misal: Konselor Sekolah]</span>
+            <!-- FOOTER -->
+            <div class="footer">
+                Laporan ini dihasilkan secara otomatis oleh Sistem Aplikasi MoodVis.
+                <br>
+                Untuk interpretasi yang lebih mendalam, sangat disarankan untuk berkonsultasi langsung dengan konselor sekolah.
+            </div>
         </div>
-
-        <div class="disclaimer">
-            *Laporan ini dihasilkan secara otomatis oleh Sistem Aplikasi MoodVis dan berfungsi sebagai panduan awal. Untuk interpretasi yang lebih mendalam dan konseling personal, sangat disarankan untuk berkonsultasi langsung dengan konselor atau psikolog sekolah.
-        </div>
+        <!-- =============================================================== -->
     </div>
 </body>
 </html>

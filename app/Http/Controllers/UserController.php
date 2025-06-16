@@ -20,7 +20,8 @@ class UserController extends Controller
             'name' => 'required|string|max:100',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
-            'role' => 'required|string|in:murid,pengajar'
+            'role' => 'required|string|in:murid,pengajar',
+            'class_id' => 'required_if:role,murid|nullable|exists:classes,id'
         ]);
 
 
@@ -29,6 +30,8 @@ class UserController extends Controller
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
             'role' => $request->input('role'),
+            // Simpan class_id jika role adalah murid
+            'class_id' => $request->input('role') === 'murid' ? $request->input('class_id') : null,
         ]);
 
 
@@ -100,16 +103,16 @@ class UserController extends Controller
         }
 
 
-        $query = User::where('teacher_id', $teacher->id);
+        $homeroomClass = $teacher->homeroomClass;
 
-
-        if ($request->has('class_id') && $request->input('class_id') != '') {
-            $query->where('class_id', $request->input('class_id'));
+        // 2. Jika guru tidak menjadi wali kelas manapun, kembalikan array kosong.
+        if (!$homeroomClass) {
+            return response()->json(['status' => 'success', 'students' => []]);
         }
 
-
-        $students = $query->orderBy('name', 'asc')
-            ->with('class:id,name')
+        // 3. Ambil semua siswa dari kelas tersebut.
+        $students = $homeroomClass->students() // memanggil relasi
+            ->orderBy('name', 'asc')
             ->get(['id', 'name', 'email', 'photo', 'class_id']);
 
 
