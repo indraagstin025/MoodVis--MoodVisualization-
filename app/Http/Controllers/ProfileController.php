@@ -3,85 +3,87 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User; // Tambahkan ini jika Anda belum menggunakannya
-use Illuminate\Support\Facades\Storage; // Tambahkan ini jika Anda menggunakan Storage facade untuk unlink
+use App\Models\User;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
     public function update(Request $request)
     {
-        // Validasi Anda, ini sudah benar.
-        // Rule 'sometimes' sudah bagus untuk field opsional.
-        $this->validate($request, [
-            'name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:users,email,' . auth()->id(),
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'class_id' => 'sometimes|nullable|integer|exists:classes,id' // <-- Validasi ini sudah benar
-        ]);
-
-        $user = User::find(auth()->id()); // Menggunakan Model User
+        // --- PERBAIKAN DI SINI ---
+        // Mengambil user dengan User::find() agar linter mengenali tipenya
+        $user = User::find(auth()->id());
 
         if (!$user) {
             return response()->json(['status' => 'error', 'message' => 'User not found.'], 404);
         }
 
-        // Logika update nama dan email (tidak berubah)
-        if ($request->has('name')) {
-            $user->name = $request->input('name');
-        }
-        if ($request->has('email')) {
-            $user->email = $request->input('email');
+        // --- VALIDASI KONDISIONAL ---
+        // Aturan validasi dasar
+        $rules = [
+            'name' => 'nullable|string|max:255',
+            'email' => ['nullable', 'email', Rule::unique('users')->ignore($user->id)],
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ];
+
+        // Tambahkan aturan untuk class_id HANYA JIKA role pengguna adalah 'murid'
+        if ($user->role === 'murid') {
+            $rules['class_id'] = 'required|integer|exists:classes,id';
         }
 
-        // --- TAMBAHKAN BARIS INI UNTUK MENYIMPAN CLASS_ID ---
-        // Karena `class_id` bisa `nullable` dan `sometimes`,
-        // kita perlu secara eksplisit menanganinya.
-        // Jika `class_id` dikirim, set nilainya.
-        // Jika tidak dikirim sama sekali, nilainya akan tetap.
-        // Jika dikirim `null` (misal dari form tanpa pilihan), maka akan diset null.
-        if ($request->has('class_id')) {
-            $user->class_id = $request->input('class_id');
-        } else {
-            // Optional: Jika `class_id` tidak dikirim sama sekali, Anda bisa memutuskan
-            // untuk tidak mengubahnya atau menyetelnya ke null secara eksplisit jika diperlukan.
-            // Untuk kasus ini, 'sometimes' berarti kita biarkan nilai yang ada jika tidak dikirim.
-            // Jika Anda ingin menyetelnya ke NULL jika tidak dikirim, gunakan:
-            // $user->class_id = null;
-        }
-        // ----------------------------------------------------
+        // Pesan error kustom
+        $messages = [
+            'class_id.required' => 'Sebagai murid, Anda wajib memilih kelas.',
+        ];
 
-        // Logika upload file
+        // Jalankan validasi
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        // --- AKHIR DARI VALIDASI ---
+
+
+        // Lanjutkan proses update jika validasi berhasil
+        // Gunakan `validated()` untuk keamanan, agar hanya data yang lolos validasi yang digunakan
+        $validatedData = $validator->validated();
+
+        if (isset($validatedData['name'])) {
+            $user->name = $validatedData['name'];
+        }
+        if (isset($validatedData['email'])) {
+            $user->email = $validatedData['email'];
+        }
+        if (isset($validatedData['class_id'])) {
+            $user->class_id = $validatedData['class_id'];
+        }
+
         if ($request->hasFile('photo')) {
-            // Logika untuk menghapus foto lama (jika ada)
-            if ($user->photo) {
-                // PERBAIKAN UNTUK LUMEN (1) - Menggunakan base_path() atau public_path()
-                // Lebih disarankan menggunakan Storage facade jika sudah dikonfigurasi,
-                // tapi jika langsung ke public folder, app()->basePath('public/') sudah benar.
-                $oldPhotoPath = app()->basePath('public/profile/' . $user->photo);
-                if (file_exists($oldPhotoPath)) {
-                    unlink($oldPhotoPath);
-                }
+            // Menggunakan app()->basePath() sesuai permintaan
+            $profilePath = app()->basePath('public/profile');
+
+            // Hapus foto lama jika ada
+            if ($user->photo && file_exists($profilePath . '/' . $user->photo)) {
+                unlink($profilePath . '/' . $user->photo);
             }
 
+            // Pindahkan dan simpan file foto yang baru
             $photo = $request->file('photo');
             $filename = time() . '.' . $photo->getClientOriginalExtension();
-
-            // PERBAIKAN UNTUK LUMEN (2)
-            // Simpan file langsung ke dalam folder 'public/profile'
-            $photo->move(app()->basePath('public/profile'), $filename);
+            $photo->move($profilePath, $filename);
 
             $user->photo = $filename;
         }
 
         $user->save();
 
-        // Respons JSON Anda (tidak berubah, sudah benar)
         return response()->json([
             'status' => 'success',
-            'message' => 'Profile updated',
-            // Pastikan Anda memuat ulang (fresh) user atau hanya memilih atribut yang diperbarui
-            // Agar respons JSON mencakup perubahan class_id.
-            'user' => $user->fresh()->only(['id', 'name', 'email', 'photo_url', 'class_id', 'role']),
+            'message' => 'Profile updated successfully.',
+            // Kembalikan data user yang baru agar localStorage di frontend bisa update
+            'user' => $user->fresh()->only(['id', 'name', 'email', 'photo_url', 'role', 'class_id']),
         ]);
     }
 }

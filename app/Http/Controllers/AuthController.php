@@ -105,11 +105,20 @@ class AuthController extends Controller
     /**
      * Mendapatkan data pengguna yang sedang terautentikasi.
      */
-    public function me()
+  public function me()
     {
+        // Mengambil data user yang sedang login
+        $user = auth()->user();
+
+        // Jika user tidak ditemukan, kembalikan error (pengaman tambahan)
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated.'], 401);
+        }
+
         return response()->json([
             'status' => 'success',
-            'user' => auth()->user()->only(['id', 'name', 'email', 'photo_url', 'role'])
+            // --- PERBAIKAN DI SINI: Tambahkan 'class_id' ---
+            'user' => $user->only(['id', 'name', 'email', 'photo_url', 'role', 'class_id'])
         ]);
     }
 
