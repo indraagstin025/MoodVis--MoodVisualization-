@@ -2,23 +2,25 @@
 
 return [
     /*
-     |--------------------------------------------------------------------------
-     | CORS настроить параметры.
-     |--------------------------------------------------------------------------
-     |
-     | здесь вы можете настроить параметры CORS.
-     |
-     | The allowed_origins, allowed_headers и allowed_methods can be set to array('*')
-     | to accept any value.
-     |
-     */
-    'paths' => ['api/*', 'register', 'login', 'logout', 'me', 'moods/*', '*'],
-    'allowed_methods' => ['*'],
-    'allowed_origins' => ['http://127.0.0.1:5501', 'http://localhost:5501'],
+    |--------------------------------------------------------------------------
+    | Cross-Origin Resource Sharing (CORS) Configuration
+    |--------------------------------------------------------------------------
+    */
+
+    'paths' => ['/api/*'], // Aturan ini hanya berlaku untuk semua rute yang diawali 'api/'
+
+    'allowed_methods' => ['*'], // Izinkan semua metode (GET, POST, PUT, DELETE, etc.)
+
+    'allowed_origins' => ['*'], // Izinkan semua URL asal untuk development
+
     'allowed_origins_patterns' => [],
-    'allowed_headers' => ['*'],
+
+    'allowed_headers' => ['*'], // Izinkan semua header
+
     'exposed_headers' => [],
+
     'max_age' => 0,
-    'supports_credentials' => false,
-    
+
+    'supports_credentials' => true, // INI SANGAT PENTING, UBAH MENJADI TRUE
+
 ];
