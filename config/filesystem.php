@@ -37,9 +37,16 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
+        ],
+
+        'profile_pictures' => [
+            'driver'     => 'local',
+            'root'       => dirname(__DIR__) . '/public/profile', // <-- PERBAIKAN DI SINI
+            'url'        => env('APP_URL') . '/profile',
+            'visibility' => 'public',
         ],
 
         's3' => [
@@ -67,6 +74,6 @@ return [
     */
 
     'links' => [
-        __DIR__.'/../../public/storage' => storage_path('app/public'),
+        __DIR__ . '/../../public/storage' => storage_path('app/public'),
     ],
 ];

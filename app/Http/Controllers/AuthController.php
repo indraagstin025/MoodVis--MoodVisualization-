@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -125,22 +126,33 @@ class AuthController extends Controller
     /**
      * Melakukan logout dengan membatalkan token saat ini.
      */
-    public function logout()
-    {
-        try {
-            JWTAuth::invalidate(JWTAuth::getToken());
+public function logout()
+{
+    try {
+        $token = JWTAuth::getToken();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Successfully logged out'
-            ], 200);
-        } catch (\Exception $e) {
+        if (!$token) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Logout failed, please try again.'
-            ], 500);
+                'message' => 'Token not provided'
+            ], 400);
         }
+
+        JWTAuth::invalidate($token);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Successfully logged out'
+        ], 200);
+    } catch (\Exception $e) {
+        Log::error('Logout error: ' . $e->getMessage());
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Logout failed: ' . $e->getMessage(),
+        ], 500);
     }
+}
+
 
     /**
      * Memperbarui token yang sudah ada.
@@ -157,6 +169,7 @@ class AuthController extends Controller
                 'expires_in' => JWTAuth::factory()->getTTL() * 60
             ]);
         } catch (JWTException $e) {
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Token refresh failed.',

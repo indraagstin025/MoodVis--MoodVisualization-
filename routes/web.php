@@ -8,23 +8,34 @@
 |--------------------------------------------------------------------------
 */
 
+if (!function_exists('public_path')) {
+    function public_path($path = '')
+    {
+        return app()->basePath('public') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+}
+
 // Rute dasar (opsional)
 $router->get('/', function () use ($router) {
     return 'MoodVis API v' . $router->app->version();
 });
 
+
+
 // Grup untuk semua rute API dengan prefix /api
 $router->group(['prefix' => 'api'], function () use ($router) {
-
-    // == Rute Publik (Tidak Perlu Login) ==
     $router->post('/register', ['uses' => 'AuthController@register']);
     $router->post('/login', ['uses' => 'AuthController@login']);
+
+
+    // == Rute Publik (Tidak Perlu Login) ==
+
 
     // == Rute Terproteksi (Wajib Login) ==
     $router->group(['middleware' => 'auth'], function () use ($router) {
 
         // Auth & Profile
-        $router->post('/logout', ['uses' => 'AuthController@logout']);
+    $router->post('/logout', ['uses' => 'AuthController@logout']);
         $router->post('/refresh', ['uses' => 'AuthController@refresh']);
         $router->get('/me', ['uses' => 'AuthController@me']);
         $router->put('/profile', ['uses' => 'ProfileController@update']);
@@ -65,4 +76,22 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->delete('/classes/{id}', ['uses' => 'ClassController@destroy']);
         });
     });
+});
+
+$router->get('/profile/{filename}', function ($filename) {
+    $path = public_path('profile/' . $filename);
+
+    if (!file_exists($path)) {
+        return response()->json([
+            'error' => 'File tidak ditemukan',
+            'filename' => $filename,
+            'checked_path' => $path,
+            'files_in_dir' => scandir(public_path('profile')),
+        ], 404);
+    }
+
+    return response()->file($path, [
+        'Content-Type' => mime_content_type($path),
+        'Access-Control-Allow-Origin' => '*',
+    ]);
 });

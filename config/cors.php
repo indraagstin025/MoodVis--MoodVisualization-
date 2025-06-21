@@ -1,26 +1,27 @@
 <?php
 
-return [
-    /*
-    |--------------------------------------------------------------------------
-    | Cross-Origin Resource Sharing (CORS) Configuration
-    |--------------------------------------------------------------------------
-    */
+// return [
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Cross-Origin Resource Sharing (CORS) Configuration
+//     |--------------------------------------------------------------------------
+//     */
 
-    'paths' => ['/api/*'], // Aturan ini hanya berlaku untuk semua rute yang diawali 'api/'
+//     // Semua aturan CORS dinonaktifkan
+//     'paths' => ['*'],
 
-    'allowed_methods' => ['*'], // Izinkan semua metode (GET, POST, PUT, DELETE, etc.)
+//     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'], // Izinkan semua URL asal untuk development
+//     'allowed_origins' => ['https://m00thzqr-5173.asse.devtunnels.ms'],
 
-    'allowed_origins_patterns' => [],
+//     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'], // Izinkan semua header
+//     'allowed_headers' => ['*'],
 
-    'exposed_headers' => [],
+//     'exposed_headers' => [],
 
-    'max_age' => 0,
+//     'max_age' => 0,
 
-    'supports_credentials' => true, // INI SANGAT PENTING, UBAH MENJADI TRUE
+//     'supports_credentials' => true,
 
-];
+// ];

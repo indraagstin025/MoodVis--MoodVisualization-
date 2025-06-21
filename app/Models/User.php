@@ -42,15 +42,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     /**
      * Bagian ini TIDAK DIUBAH sesuai permintaan Anda.
      */
-    public function getPhotoUrlAttribute()
-    {
-        if ($this->photo) {
 
-
-            return URL::asset('profile/' . $this->photo);
-        }
-        return null;
+// Di app/Models/User.php
+public function getPhotoUrlAttribute()
+{
+    if ($this->photo) {
+        return config('app.url') . '/profile/' . $this->photo;
     }
+    return config('app.url') . '/default-avatar.jpg'; // fallback opsional
+}
+
 
     /**
      * Mendapatkan data pengajar yang membimbing murid ini.

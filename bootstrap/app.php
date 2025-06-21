@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
     dirname(__DIR__)
@@ -22,8 +22,8 @@ $app->withFacades();
 $app->withEloquent();
 
 // Ini sudah benar, biarkan seperti ini
-$app->configure('cors');
 $app->configure('database');
+$app->configure('cors');
 
 /*
 |--------------------------------------------------------------------------
@@ -77,7 +77,8 @@ $app->register(\Barryvdh\DomPDF\ServiceProvider::class);
 // INI BAGIAN YANG DIPERBAIKI. KOSONGKAN DARI SEMUA MIDDLEWARE CORS.
 // =======================================================================
 $app->middleware([
-    // App\Http\Middleware\ExampleMiddleware::class // Boleh dikomentari atau dihapus
+    App\Http\Middleware\CorsMiddleware::class,
+    //     // App\Http\Middleware\ExampleMiddleware::class // Boleh dikomentari atau dihapus
 ]);
 
 $app->routeMiddleware([
@@ -97,7 +98,7 @@ $app->routeMiddleware([
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__ . '/../routes/web.php';
 });
 
 return $app;
