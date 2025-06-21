@@ -21,7 +21,7 @@ class CorsMiddleware
         $allowedOrigins = array_map('trim', [
             'https://m00thzqr-5173.asse.devtunnels.ms',
             'http://localhost:5173',
-            'https://d662-2001-448a-3030-28d4-a80c-ab88-f873-da20.ngrok-free.app', // contoh ngrok frontend
+            'https://56fd-114-122-70-127.ngrok-free.app', // contoh ngrok frontend
         ]);
 
         // Untuk preflight request
